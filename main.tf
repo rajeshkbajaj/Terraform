@@ -69,12 +69,12 @@ resource "aws_instance" "nginx" {
     connection {
       type        = "ssh"
       user        = local.ssh_user
-      private_key_path = ./devops-project.pem
+      private_key_path = "./devops-project.pem"
       host        = aws_instance.nginx.public_ip
     }
     
   }
-}
+
 
 
 
