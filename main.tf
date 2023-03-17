@@ -40,9 +40,9 @@ resource "aws_security_group" "nginx" {
   }
 }
 
-resource "aws_key_pair" "id_rsa" {
-  key_name   = "id_rsa"
-  public_key = file("~/.ssh/id_rsa.pub")
+resource "aws_key_pair" "ec2-keypair" {
+  key_name   = "authorized_keys"
+  public_key = "sh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCmIN4kybSZ3kd+rwX8QoyPui4EOMZEeFbP/BpBZ1A15cyQ1vWgQLRlyr41MKIjfFa6Nrlf3H+GiTbsAjYicpz2uXzsrOOQC+1aT7vK4RcXSjPvxtZgJw4BMwbES0j492akqtXb9fP5uEumt3rkNhmkb0olFEqeEsB1qFXbruTFbiNhyfybdkfTyZ4qQOUdm+3ZSVDJUanGTI2NqyVzNeGtQtBiEDFTP0I6sEjAckEetr8IA0LP5VF1GTWIZIxn002pcln8Xts/tYZ1r3FoMuI6BtDcKTkm3fpQzLc0NZEG/bB/BahMUhwTfO/nYA9NRjAwoHLlv23jveQ4cDjb7tGj devops-project"
 }
 
 resource "aws_instance" "nginx" {
@@ -51,26 +51,8 @@ resource "aws_instance" "nginx" {
   instance_type               = "t2.micro"
   associate_public_ip_address = true
   security_groups             = [aws_security_group.nginx.id]
-  key_name                    = aws_key_pair.id_rsa.key_name
-
-  provisioner "remote-exec" {
-    inline = ["sudo apt-get update -y",
-              "git clone https://github.com/rajeshkbajaj/Express.git",
-              "cd /home/ubuntu/express/examples",
-              "sudo apt install nodejs -y",
-              "sudo apt install npm -y",
-              "npm install",
-              "cd ./examples/hello-world/",
-              "node index.js"
-              ]
-  }
-    connection {
-      type        = "ssh"
-      user        = local.ssh_user
-      private_key = file("~/.ssh/id_rsa")
-      host        = aws_instance.nginx.public_ip
-    }
-    
+  key_name                    = aws_key_pair.ec2-keypair.key_name
+  
   }
 
 
