@@ -7,6 +7,10 @@ terraform {
   }
 }
 
+# Configure the AWS Provider
+provider "aws" {
+  region = "ap-northeast-1"
+}
 
 locals {
   vpc_id           = "vpc-02387fae1fb7303a1"
