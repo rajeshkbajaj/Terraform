@@ -2,9 +2,7 @@ locals {
   vpc_id           = "vpc-02387fae1fb7303a1"
   subnet_id        = "subnet-0c298bca95293811e"
   ssh_user         = "ubuntu"
-  key_name         = "devops-project"
-  private_key_path = "./devops-project.pem"
-}
+ }
 
 provider "aws" {
   region = "ap-northeast-1"
@@ -42,20 +40,20 @@ resource "aws_security_group" "nginx" {
   }
 }
 
+resource "aws_key_pair" "id_rsa" {
+  key_name   = "id_rsa"
+  public_key = file("~/.ssh/id_rsa.pub")
+}
+
 resource "aws_instance" "nginx" {
   ami                         = "ami-05375ba8414409b07"
   subnet_id                   = "subnet-0c298bca95293811e"
   instance_type               = "t2.micro"
   associate_public_ip_address = true
   security_groups             = [aws_security_group.nginx.id]
-  key_name                    = local.key_name
+  key_name                    = aws_key_pair.id_rsa.key_name
 
-    provisioner "file" {
-    source      = "./devops-project.pem"
-    destination = "/home/ubuntu//devops-project.pem"
-    }
-
- provisioner "remote-exec" {
+  provisioner "remote-exec" {
     inline = ["sudo apt-get update -y",
               "git clone https://github.com/rajeshkbajaj/Express.git",
               "cd /home/ubuntu/express/examples",
@@ -69,7 +67,7 @@ resource "aws_instance" "nginx" {
     connection {
       type        = "ssh"
       user        = local.ssh_user
-      private_key_path = "./devops-project.pem"
+      private_key = file("~/.ssh/id_rsa")
       host        = aws_instance.nginx.public_ip
     }
     
