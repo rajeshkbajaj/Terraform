@@ -14,10 +14,6 @@ locals {
   ssh_user         = "ubuntu"
  }
 
-provider "aws" {
-  region = "ap-northeast-1"
-}
-
 resource "aws_security_group" "rajesh" {
   name   = "rajesh_access"
   vpc_id = local.vpc_id
